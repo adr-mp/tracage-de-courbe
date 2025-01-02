@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculatrice Graphique Interactive</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body{
+    background-image: url("tr.webp");
+    background-attachment: fixed;}
+    
+       .navbar-nav .nav-item {
+            margin-right: 20px; 
+        }
+        
+        .navbar-nav .nav-item:last-child {
+            margin-right: 0; 
+        }
+        .custom-spinner {
+            color: #93b012; /* Couleur personnalisée, ici un orange vif */
+            position: relative;
+          }    
+          #logo{
+            width: 5%
+        }
+        .navbar-gradient {
+            background: linear-gradient(to right, #8aa214,  #071d9b); 
+        }        
+    .function-input {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .function-input:focus {
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    }
+    .graph-container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .control-panel {
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .trr{
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 1%;
+      
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-gradient">  
+    <img id="logo" src="aaqq.png" alt="">
+      <div class="container-fluid">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav">
+                  <li class="nav-item">
+                      <a class="nav-link" href="statistique.html">Accueil</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Fonctionnalités</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="contact.html">À propos</a>
+                  </li>  
+                  <a class="navbar-brand" href="index.html">Quaternion+</a>
+              </ul>
+          </div>
+      </div>
+  </nav>
+  <div class="max-w-6xl mx-auto">
+    <div class="trr">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-800 mb-2">Calculatrice Graphique Interactive</h1>
+      <p class="text-gray-600">Tracez et explorez des fonctions mathématiques</p>
+    </header>
+</div>
+    <div class="grid gap-6 md:grid-cols-3">
+      <div class="md:col-span-2">
+        <div class="graph-container p-4">
+          <canvas id="graphCanvas" width="800" height="500" class="w-full h-auto"></canvas>
+        </div>
+      </div>
+
+      <div class="control-panel p-6">
+        <div class="mb-6">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="functionInput">
+            Fonction f(x) :
+          </label>
+          <input 
+            type="text" 
+            id="functionInput" 
+            class="function-input w-full p-3 mb-2"
+            placeholder="Ex: Math.sin(x)"
+          >
+          <p class="text-sm text-gray-500">Exemples: x*x, Math.sin(x), Math.cos(x)</p>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-gray-700 text-sm font-bold mb-2">
+            Échelle :
+          </label>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <input 
+                type="number" 
+                id="scaleX" 
+                class="function-input w-full p-2"
+                value="40"
+              >
+              <p class="text-xs text-gray-500">Échelle X</p>
+            </div>
+            <div>
+              <input 
+                type="number" 
+                id="scaleY" 
+                class="function-input w-full p-2"
+                value="40"
+              >
+              <p class="text-xs text-gray-500">Échelle Y</p>
+            </div>
+          </div>
+        </div>
+
+        <button 
+          id="drawButton"
+          class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition duration-200"
+        >
+          Tracer la courbe
+        </button>
+
+        <div class="mt-6">
+          <h3 class="text-gray-700 font-bold mb-2">Fonctions disponibles :</h3>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li>• Math.sin(x), Math.cos(x), Math.tan(x)</li>
+            <li>• Math.pow(x, 2), Math.sqrt(x)</li>
+            <li>• Math.exp(x), Math.log(x)</li>
+            <li>• Math.abs(x)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    function drawGrid(scaleX, scaleY) {
+      ctx.beginPath();
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 0.5;
+
+      // Lignes verticales
+      for (let x = 0; x <= width; x += scaleX) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+
+      // Lignes horizontales
+      for (let y = 0; y <= height; y += scaleY) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+      }
+
+      ctx.stroke();
+    }
+
+    function drawAxes() {
+      ctx.clearRect(0, 0, width, height);
+      
+      const scaleX = parseFloat(document.getElementById('scaleX').value);
+      const scaleY = parseFloat(document.getElementById('scaleY').value);
+      
+      drawGrid(scaleX, scaleY);
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#2d3748';
+      ctx.lineWidth = 2;
+
+      // Axe X
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+
+      // Axe Y
+      ctx.moveTo(width / 2, 0);
+      ctx.lineTo(width / 2, height);
+
+      ctx.stroke();
+
+      // Graduation des axes
+      ctx.fillStyle = '#2d3748';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Graduations X
+      for (let x = -10; x <= 10; x++) {
+        const canvasX = width / 2 + x * scaleX;
+        if (x !== 0) {
+          ctx.fillText(x.toString(), canvasX, height / 2 + 20);
+        }
+      }
+
+      // Graduations Y
+      ctx.textAlign = 'right';
+      for (let y = -10; y <= 10; y++) {
+        const canvasY = height / 2 - y * scaleY;
+        if (y !== 0) {
+          ctx.fillText(y.toString(), width / 2 - 10, canvasY);
+        }
+      }
+    }
+
+    function plotFunction(fn) {
+      const scaleX = parseFloat(document.getElementById('scaleX').value);
+      const scaleY = parseFloat(document.getElementById('scaleY').value);
+
+      drawAxes();
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#4299e1';
+      ctx.lineWidth = 2.5;
+
+      let isFirstPoint = true;
+      let lastY = null;
+
+      for (let x = -width / 2; x < width / 2; x++) {
+        const scaledX = x / scaleX;
+        const scaledY = fn(scaledX);
+        
+        // Vérifier si la valeur est valide
+        if (isNaN(scaledY) || !isFinite(scaledY)) {
+          isFirstPoint = true;
+          continue;
+        }
+
+        const canvasX = width / 2 + x;
+        const canvasY = height / 2 - scaledY * scaleY;
+
+        // Détecter les discontinuités
+        if (lastY !== null && Math.abs(canvasY - lastY) > height / 2) {
+          isFirstPoint = true;
+        }
+
+        if (isFirstPoint) {
+          ctx.moveTo(canvasX, canvasY);
+          isFirstPoint = false;
+        } else {
+          ctx.lineTo(canvasX, canvasY);
+        }
+
+        lastY = canvasY;
+      }
+
+      ctx.stroke();
+    }
+
+    document.getElementById('drawButton').addEventListener('click', () => {
+      const functionInput = document.getElementById('functionInput').value;
+
+      try {
+        const fn = new Function('x', `return ${functionInput}`);
+        plotFunction(fn);
+      } catch (error) {
+        alert('Erreur : La fonction entrée est invalide. Veuillez vérifier la syntaxe.');
+      }
+    });
+
+    // Mise à jour initiale
+    drawAxes();
+
+    // Responsive canvas
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const ratio = canvas.width / canvas.height;
+      canvas.style.width = '100%';
+      canvas.style.height = `${container.offsetWidth / ratio}px`;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+  </script>
+</body>
+</html>
